@@ -5,6 +5,8 @@ create table if not exists public.rooms (
   host_identity text,
   live boolean default false,
   viewers integer default 0,
+  likes integer default 0,
+  thumbnail_url text,
   created_at timestamp with time zone default now()
 );
 
@@ -32,6 +34,19 @@ as $
 $;
 
 grant execute on function public.rpc_increment_viewers(text, integer) to anon, authenticated;
+
+-- Optional RPC to increment likes atomically
+create or replace function public.rpc_increment_likes(room_id text, delta integer)
+returns integer
+language sql
+as $
+  update public.rooms
+  set likes = greatest(0, likes + delta)
+  where id = room_id
+  returning likes;
+$;
+
+grant execute on function public.rpc_increment_likes(text, integer) to anon, authenticated;
 
 -- Realtime enable
 alter publication supabase_realtime add table rooms;

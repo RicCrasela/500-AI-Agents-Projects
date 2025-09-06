@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import Image from "next/image";
 
 type LiveRoom = {
   id: string;
   title: string;
   live: boolean;
   viewers: number;
+  thumbnail_url?: string | null;
 };
 
 export default function Home() {
@@ -47,8 +49,13 @@ export default function Home() {
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
         {rooms.map((r) => (
           <Link key={r.id} href={`/live/${r.id}`} className="relative rounded-xl overflow-hidden bg-neutral-900">
-            <div className="aspect-[9/16] bg-neutral-800 flex items-end p-3">
-              <div className="w-full">
+            <div className="aspect-[9/16] relative">
+              {r.thumbnail_url ? (
+                <Image src={r.thumbnail_url} alt={r.title} fill style={{objectFit:"cover"}} />
+              ) : (
+                <div className="absolute inset-0 bg-neutral-800 flex items-center justify-center">No Cover</div>
+              )}
+              <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
                 <span className="text-xs bg-pink-600 px-2 py-0.5 rounded">LIVE</span>
                 <h3 className="text-sm mt-1 line-clamp-2">{r.title}</h3>
                 <p className="text-xs opacity-70">{r.viewers} penonton</p>
