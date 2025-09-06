@@ -3,9 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { RoomAudioRenderer, ControlBar, LiveKitRoom } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+import Chat from "@/components/Chat";
+import { supabase } from "@/lib/supabase";
 
 async function fetchViewerToken(roomName: string) {
   const res = await fetch(`/api/token?room=${encodeURIComponent(roomName)}&role=viewer`);
@@ -17,6 +16,7 @@ async function fetchViewerToken(roomName: string) {
 export default function LiveRoomPage({ params }: { params: { roomId: string } }) {
   const roomName = params.roomId;
   const [token, setToken] = useState<string>();
+  const [identity] = useState(() => `viewer-${Math.random().toString(36).slice(2, 8)}`);
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || process.env.LIVEKIT_URL;
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export default function LiveRoomPage({ params }: { params: { roomId: string } })
           className="h-[100svh]"
         >
           <RoomAudioRenderer />
-          <div className="absolute inset-0 pointer-events-none" />
+          <Chat roomId={roomName} identity={identity} />
           <div className="absolute bottom-0 left-0 right-0">
             <ControlBar className="bg-black/40" />
           </div>
