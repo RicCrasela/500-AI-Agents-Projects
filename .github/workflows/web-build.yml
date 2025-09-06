@@ -1,0 +1,50 @@
+name: Web Build (apps/web)
+
+on:
+  push:
+    branches: [ main, preview/**, feature/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9.6.0
+
+      - name: Install deps (root)
+        working-directory: .
+        run: pnpm i --frozen-lockfile=false
+
+      - name: Lint
+        run: pnpm lint
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: anon
+          LIVEKIT_URL: wss://example.com
+          LIVEKIT_API_KEY: key
+          LIVEKIT_API_SECRET: secret
+
+      - name: Build
+        run: pnpm build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost' }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'anon' }}
+          LIVEKIT_URL: ${{ secrets.LIVEKIT_URL || 'wss://example.com' }}
+          LIVEKIT_API_KEY: ${{ secrets.LIVEKIT_API_KEY || 'key' }}
+          LIVEKIT_API_SECRET: ${{ secrets.LIVEKIT_API_SECRET || 'secret' }}
+          NEXT_PUBLIC_APP_NAME: LiveTok
