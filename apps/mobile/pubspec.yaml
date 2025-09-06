@@ -1,0 +1,26 @@
+name: livetok_mobile
+description: "LiveTok Flutter client"
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  http: ^1.2.2
+  livekit_client: ^2.2.5
+  supabase_flutter: ^2.6.0
+  flutter_dotenv: ^5.1.0
+  riverpod: ^2.5.1
+  flutter_riverpod: ^2.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
