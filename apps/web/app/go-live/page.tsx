@@ -11,20 +11,39 @@ async function fetchHostToken(roomName: string, identity: string) {
   return token as string;
 }
 
+async function upsertRoom(id: string, title?: string) {
+  await fetch("/api/rooms", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, title, live: true }),
+  });
+}
+
 export default function GoLive() {
   const [title, setTitle] = useState("");
   const [room, setRoom] = useState("");
   const [token, setToken] = useState<string>();
+  const [roomName, setRoomName] = useState<string>("");
   const [identity] = useState(() => `host-${Math.random().toString(36).slice(2, 8)}`);
   const livekitUrl = process.env.NEXT_PUBLIC_LIVEKIT_URL || process.env.LIVEKIT_URL;
 
   const handleStart = async () => {
-    const roomName = room || title.replace(/\s+/g, "-").toLowerCase().slice(0, 24) || `room-${Date.now()}`;
-    const tok = await fetchHostToken(roomName, identity);
+    const rn = room || title.replace(/\s+/g, "-").toLowerCase().slice(0, 24) || `room-${Date.now()}`;
+    setRoomName(rn);
+    await upsertRoom(rn, title);
+    const tok = await fetchHostToken(rn, identity);
     setToken(tok);
   };
 
   const serverUrl = useMemo(() => livekitUrl, [livekitUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (roomName) {
+        fetch("/api/rooms", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: roomName, live: false, viewers: 0 }) });
+      }
+    };
+  }, [roomName]);
 
   return (
     <main className="min-h-screen">
