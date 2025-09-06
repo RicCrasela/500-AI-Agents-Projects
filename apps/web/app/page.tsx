@@ -2,19 +2,14 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
 
 type LiveRoom = {
   id: string;
   title: string;
-  thumbnail?: string | null;
   live: boolean;
   viewers: number;
 };
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default function Home() {
   const [rooms, setRooms] = useState<LiveRoom[]>([]);
@@ -29,8 +24,8 @@ export default function Home() {
     const channel = supabase
       .channel("rooms_changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "rooms" }, (payload) => {
+        const row = payload.new as LiveRoom;
         setRooms((prev) => {
-          const row = payload.new as LiveRoom;
           const others = prev.filter((r) => r.id !== row.id);
           return row.live ? [row, ...others] : others;
         });
@@ -52,7 +47,6 @@ export default function Home() {
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4">
         {rooms.map((r) => (
           <Link key={r.id} href={`/live/${r.id}`} className="relative rounded-xl overflow-hidden bg-neutral-900">
-            {/* Thumbnail placeholder */}
             <div className="aspect-[9/16] bg-neutral-800 flex items-end p-3">
               <div className="w-full">
                 <span className="text-xs bg-pink-600 px-2 py-0.5 rounded">LIVE</span>
