@@ -1,0 +1,15 @@
+{
+  "name": "livetok-monorepo",
+  "private": true,
+  "packageManager": "pnpm@9.6.0",
+  "workspaces": [
+    "apps/web",
+    "packages/shared"
+  ],
+  "scripts": {
+    "dev": "pnpm -C apps/web dev",
+    "build": "pnpm -C apps/web build",
+    "start": "pnpm -C apps/web start",
+    "lint": "pnpm -C apps/web lint"
+  }
+}
