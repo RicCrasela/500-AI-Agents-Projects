@@ -20,6 +20,19 @@ create table if not exists public.chat_messages (
 -- Index for fast lookups
 create index if not exists chat_room_idx on public.chat_messages(room_id, created_at desc);
 
+-- RPC to increment viewers atomically
+create or replace function public.rpc_increment_viewers(room_id text, delta integer)
+returns integer
+language sql
+as $
+  update public.rooms
+  set viewers = greatest(0, viewers + delta)
+  where id = room_id
+  returning viewers;
+$;
+
+grant execute on function public.rpc_increment_viewers(text, integer) to anon, authenticated;
+
 -- Realtime enable
 alter publication supabase_realtime add table rooms;
 alter publication supabase_realtime add table chat_messages;

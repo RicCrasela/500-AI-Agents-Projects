@@ -13,6 +13,14 @@ async function fetchViewerToken(roomName: string) {
   return token as string;
 }
 
+async function incrementViewers(id: string, delta: number) {
+  await fetch("/api/rooms/increment", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, delta }),
+  });
+}
+
 export default function LiveRoomPage({ params }: { params: { roomId: string } }) {
   const roomName = params.roomId;
   const [token, setToken] = useState<string>();
@@ -23,10 +31,21 @@ export default function LiveRoomPage({ params }: { params: { roomId: string } })
     fetchViewerToken(roomName).then(setToken).catch(console.error);
   }, [roomName]);
 
-  // simple presence/viewers update
+  // presence/viewers update atomically using RPC
   useEffect(() => {
+    let active = true;
+    incrementViewers(roomName, +1).catch(() => {});
     const channel = supabase.channel(`room:${roomName}`).subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const handleUnload = () => {
+      if (active) incrementViewers(roomName, -1);
+    };
+    window.addEventListener("beforeunload", handleUnload);
+    return () => {
+      active = false;
+      incrementViewers(roomName, -1).catch(() => {});
+      supabase.removeChannel(channel);
+      window.removeEventListener("beforeunload", handleUnload);
+    };
   }, [roomName]);
 
   const serverUrl = useMemo(() => livekitUrl, [livekitUrl]);
