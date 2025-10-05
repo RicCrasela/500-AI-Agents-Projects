@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>YouTube Player</title>
+    <meta name="description" content="A simple YouTube playlist app using the IFrame Player API." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app__header">
+        <h1>▶️ YouTube Player</h1>
+        <p class="subtitle">Putar daftar video YouTube dengan kontrol play/pause, seek, volume, shuffle, repeat.</p>
+      </header>
+
+      <section class="controls">
+        <div class="now">
+          <div class="cover" id="cover" aria-hidden="true"></div>
+          <div class="now__meta">
+            <div class="now__title" id="now-title">Tidak ada video</div>
+            <div class="now__artist" id="now-artist">YouTube</div>
+          </div>
+        </div>
+
+        <div class="transport">
+          <div class="player">
+            <div id="player" class="player__iframe" aria-label="YouTube player"></div>
+          </div>
+
+          <div class="time">
+            <span id="current-time">00:00</span>
+            <input type="range" id="progress" min="0" max="100" value="0" aria-label="Seek" />
+            <span id="duration">00:00</span>
+          </div>
+
+          <div class="buttons">
+            <button id="prev" title="Sebelumnya" aria-label="Sebelumnya">⏮</button>
+            <button id="play" title="Putar/Jeda" aria-label="Putar/Jeda">⏯</button>
+            <button id="next" title="Berikutnya" aria-label="Berikutnya">⏭</button>
+            <button id="shuffle" title="Acak" aria-label="Acak">🔀</button>
+            <button id="repeat" title="Ulangi (Off → Satu → Semua)" aria-label="Ulangi">🔁</button>
+            <button id="mute" title="Bisu" aria-label="Bisu">🔇</button>
+            <input type="range" id="volume" min="0" max="100" value="80" aria-label="Volume" />
+          </div>
+        </div>
+      </section>
+
+      <section class="playlist">
+        <div class="playlist__toolbar">
+          <button id="add-url">🔗 Tambah URL/ID</button>
+          <button id="clear">🗑️ Bersihkan</button>
+        </div>
+
+        <ul id="playlist" class="playlist__list" aria-live="polite" aria-label="Daftar putar"></ul>
+
+        <div class="persist-note">
+          Playlist tersimpan otomatis (localStorage). Tambah video menggunakan URL YouTube atau ID video.
+        </div>
+      </section>
+
+      <footer class="app__footer">
+        <div class="footer__left">
+          Dibuat dengan YouTube IFrame API.
+        </div>
+        <div class="footer__right">
+          <a href="https://developers.google.com/youtube/iframe_api_reference" target="_blank" rel="noopener">Docs API</a>
+        </div>
+      </footer>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
