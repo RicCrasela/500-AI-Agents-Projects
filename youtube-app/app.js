@@ -112,9 +112,13 @@
     // Prefill settings UI
     populateSettingsUI();
 
-    // Show autoplay banner until user interacts
-    showAutoplayBanner();
-    attachAutoplayUnlock();
+    // Show autoplay banner until user interacts (if enabled)
+    if (settings.showAutoplayBanner) {
+      showAutoplayBanner();
+      attachAutoplayUnlock();
+    } else {
+      hideAutoplayBanner();
+    }
   };
 
   const onPlayerStateChange = (event) => {
@@ -722,7 +726,8 @@
     if (bannerEl) {
       bannerEl.addEventListener("click", onFirstUserInteract, { once: true });
       bannerEl.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") });
+        if (e.key === "Enter" || e.key === " ") onFirstUserInteract();
+      }, { once: true });
 
   els.exportBtn.addEventListener("click", exportPlaylist);
 
@@ -947,6 +952,7 @@
     maxResults: 20,
     defaultPrivacy: "private",
     rememberBrowserURL: false,
+    showAutoplayBanner: true,
   };
   let settings = { ...defaultSettings };
 
@@ -968,6 +974,78 @@
   };
 
   const applyTheme = (theme) => {
+    const t = theme || "dark";
+    if (t === "light") {
+      document.body.setAttribute("data-theme", "light");
+    } else if (t === "system") {
+      const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+      document.body.setAttribute("data-theme", prefersLight ? "light" : "");
+      if (!prefersLight) document.body.removeAttribute("data-theme");
+    } else {
+      document.body.removeAttribute("data-theme");
+    }
+  };
+
+  const populateSettingsUI = () => {
+    const el = {
+      theme: document.getElementById("set-theme"),
+      vol: document.getElementById("set-volume"),
+      hotkeys: document.getElementById("set-hotkeys"),
+      region: document.getElementById("set-region"),
+      order: document.getElementById("set-order"),
+      max: document.getElementById("set-max"),
+      privacy: document.getElementById("set-privacy"),
+      remember: document.getElementById("set-remember-url"),
+      autoplayBanner: document.getElementById("set-autoplay-banner"),
+      save: document.getElementById("settings-save"),
+      reset: document.getElementById("settings-reset"),
+    };
+    if (!el.theme) return;
+
+    el.theme.value = settings.theme;
+    el.vol.value = String(settings.defaultVolume);
+    el.hotkeys.checked = !!settings.enableHotkeys;
+    el.region.value = settings.regionCode || "";
+    el.order.value = settings.order || "relevance";
+    el.max.value = String(settings.maxResults);
+    el.privacy.value = settings.defaultPrivacy || "private";
+    el.remember.checked = !!settings.rememberBrowserURL;
+    if (el.autoplayBanner) el.autoplayBanner.checked = !!settings.showAutoplayBanner;
+
+    el.save.onclick = () => {
+      settings.theme = el.theme.value;
+      settings.defaultVolume = Number(el.vol.value || 80);
+      settings.enableHotkeys = !!el.hotkeys.checked;
+      settings.regionCode = (el.region.value || "").trim();
+      settings.order = el.order.value;
+      settings.maxResults = Math.max(5, Math.min(50, Number(el.max.value || 20)));
+      settings.defaultPrivacy = el.privacy.value;
+      settings.rememberBrowserURL = !!el.remember.checked;
+      settings.showAutoplayBanner = !!(el.autoplayBanner?.checked);
+
+      applyTheme(settings.theme);
+      els.volume.value = String(Math.max(0, Math.min(100, settings.defaultVolume)));
+      setVolume(els.volume.value);
+      els.videoPrivacy.value = settings.defaultPrivacy;
+
+      saveSettings();
+      alert("Pengaturan disimpan.");
+      // Reflect change immediately
+      if (!settings.showAutoplayBanner) hideAutoplayBanner();
+    };
+
+    el.reset.onclick = () => {
+      settings = { ...defaultSettings };
+      saveSettings();
+      applyTheme(settings.theme);
+      populateSettingsUI();
+      els.volume.value = String(settings.defaultVolume);
+      setVolume(els.volume.value);
+      els.videoPrivacy.value = settings.defaultPrivacy;
+      if (!settings.showAutoplayBanner) hideAutoplayBanner();
+      alert("Pengaturan direset.");
+    };
+  };
     const t = theme || "dark";
     if (t === "light") {
       document.body.setAttribute("data-theme", "light");
