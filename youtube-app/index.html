@@ -83,6 +83,21 @@
         <div class="upload__status" id="upload-status">Status: belum mulai</div>
       </section>
 
+      <section class="browser">
+        <div class="browser__toolbar">
+          <input type="text" id="browser-url" placeholder="https://m.youtube.com/" value="https://m.youtube.com/" />
+          <button id="open-iframe">🧩 Buka dalam iframe</button>
+          <button id="open-tab">🪟 Buka tab baru</button>
+        </div>
+        <div class="browser__frame">
+          <iframe id="webview" title="In-app browser" referrerpolicy="no-referrer" allowfullscreen></iframe>
+        </div>
+        <div class="persist-note">
+          Catatan: YouTube sering membatasi penyematan situs penuh dengan kebijakan X-Frame-Options.
+          Jika layar kosong atau error, gunakan tombol “Buka tab baru”.
+        </div>
+      </section>
+
       <section class="playlist">
         <div class="playlist__toolbar">
           <button id="add-url">🔗 Tambah URL/ID</button>

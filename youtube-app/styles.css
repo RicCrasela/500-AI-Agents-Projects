@@ -302,6 +302,42 @@ button.active {
   color: var(--muted);
 }
 
+/* In-app browser */
+.browser {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+.browser__toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.browser__toolbar input {
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  padding: 0 10px;
+}
+.browser__frame {
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: #0b0d17;
+}
+.browser__frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 .playlist {
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.06);

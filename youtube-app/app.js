@@ -677,7 +677,7 @@
     apiKey = val;
     localStorage.setItem("youtube_api_key", apiKey);
     alert("API key disimpan.");
-    initGapiClient(); // re-init with API key
+    initGapiClient(); // re-init dengan API key
   });
 
   els.searchBtn.addEventListener("click", () => {
@@ -703,6 +703,18 @@
   els.authBtn.addEventListener("click", signIn);
   els.signOutBtn.addEventListener("click", signOut);
   els.uploadBtn.addEventListener("click", uploadVideo);
+
+  // In-app browser UI
+  const webview = document.getElementById("webview");
+  const browserUrl = document.getElementById("browser-url");
+  document.getElementById("open-iframe").addEventListener("click", () => {
+    const url = (browserUrl.value || "").trim() || "https://m.youtube.com/";
+    webview.src = url;
+  });
+  document.getElementById("open-tab").addEventListener("click", () => {
+    const url = (browserUrl.value || "").trim() || "https://m.youtube.com/";
+    window.open(url, "_blank", "noopener,noreferrer");
+  });
 
   // Keyboard shortcuts
   window.addEventListener("keydown", (e) => {
