@@ -8,6 +8,22 @@ A curated collection of AI agent use cases across industries, showcasing practic
 
 ---
 
+## 🎵 Aplikasi Musik Sederhana
+
+Kami telah menambahkan aplikasi musik web sederhana di folder `music/`.
+
+Fitur:
+- Upload beberapa file audio dan otomatis membuat playlist
+- Kontrol putar/jeda, berikutnya/sebelumnya, seek, volume dan mute
+- Visualizer audio dengan Web Audio API
+- Shortcut keyboard: Spasi (Play/Pause), panah kiri/kanan untuk mundur/maju 5 detik
+- Desain responsif dan tema gelap
+
+Cara menjalankan:
+- Buka file berikut di browser Anda: [music/index.html](file:///music/index.html)
+
+---
+
 ## 📋 Table of Contents
 
 - [Introduction](#introduction)
@@ -186,9 +202,9 @@ Whether you're a developer, researcher, or business enthusiast, this repository 
 | Use Case                                                  | Industry                 | Description                                                                   | Notebook                                                                                                                                                                     |
 | :-------------------------------------------------------- | :----------------------- | :---------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🌟 Hello-World Chat with OpenAI Assistant in AutoGen      | 🤖 Conversational AI     | A basic example of chatting with OpenAI Assistant using AutoGen.              | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_oai_assistant_twoagents_basic.ipynb) |
-| 🔧 Chat with OpenAI Assistant using Function Call         | 🔧 Development Tools     | Illustrates how to use function calls with OpenAI Assistant in chats.         | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_oai_assistant_function_call.ipynb)   |
+| 🔧 Chat with OpenAI Assistant using Function Call         | 🔧 Development Tools     | Illustrates how to use function calls with OpenAI Assistant in chats.         | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://microsoft.github.io/autogen/0.2/docs/notebooks/agentchat_oai_assistant_function_call.ipynb)   |
 | 🧠 Chat with OpenAI Assistant with Code Interpreter       | 💻 Software Development  | Demonstrates the use of OpenAI Assistant as a code interpreter in chats.      | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_oai_code_interpreter.ipynb)          |
-| 🔍 Chat with OpenAI Assistant with Retrieval Augmentation | 📚 Information Retrieval | Enables retrieval-augmented conversations with OpenAI Assistant.              | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_oai_assistant_retrieval.ipynb)       |
+| 🔍 Chat with OpenAI Assistant with Retrieval Augmentation | 📚 Information Retrieval | Enables retrieval-augmented conversations with OpenAI Assistant.              | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://microsoft.github.io/autogen/0.2/notebook/agentchat_oai_assistant_retrieval.ipynb)       |
 | 🤝 OpenAI Assistant in a Group Chat                       | 🤝 Collaboration         | Shows how OpenAI Assistant can collaborate with other agents in a group chat. | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_oai_assistant_groupchat.ipynb)       |
 | 🛠️ GPTAssistantAgent based Multi-Agent Tool Use         | 🔧 Development Tools     | Explains how to use GPTAssistantAgent for multi-agent tool usage.             | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/blob/0.2/notebook/gpt_assistant_agent_function_call.ipynb)       |
 
@@ -202,9 +218,9 @@ Whether you're a developer, researcher, or business enthusiast, this repository 
 
 | Use Case                                       | Industry            | Description                                                                       | Notebook                                                                                                                                                       |
 | :--------------------------------------------- | :------------------ | :-------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🎨 Multimodal Agent Chat with DALLE and GPT-4V | 🖼️ Multimedia AI  | Combines DALLE and GPT-4V for multimodal agent communication.                     | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_dalle_and_gpt4v.ipynb) |
-| 🖌️ Multimodal Agent Chat with Llava          | 📷 Image Processing | Uses Llava for enabling multimodal agent conversations with image processing.     | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_lmm_llava.ipynb)       |
-| 🖼️ Multimodal Agent Chat with GPT-4V         | 🖼️ Multimedia AI  | Leverages GPT-4V for visual and conversational interactions in multimodal agents. | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_lmm_gpt-4v.ipynb)      |
+| 🎨 Multimodal Agent Chat with DALLE and GPT-4V | 🖼️ Multimedia AI  | Combines DALLE and GPT-4V for multimodal agent communication.                     | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/0.2/notebook/agentchat_dalle_and_gpt4v.ipynb) |
+| 🖌️ Multimodal Agent Chat with Llava          | 📷 Image Processing | Uses Llava for enabling multimodal agent conversations with image processing.     | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/0.2/notebook/agentchat_lmm_llava.ipynb)       |
+| 🖼️ Multimodal Agent Chat with GPT-4V         | 🖼️ Multimedia AI  | Leverages GPT-4V for visual and conversational interactions in multimodal agents. | [![Notebook](https://img.shields.io/badge/View-Notebook-blue?logo=jupyter)](https://github.com/microsoft/autogen/0.2/notebook/agentchat_lmm_gpt-4v.ipynb)      |
 
 > **Long Context Handling**
 
@@ -293,7 +309,6 @@ Whether you're a developer, researcher, or business enthusiast, this repository 
 | 🧠 **Corrective RAG (Local)** | 🧠 AI / Information Retrieval | This tutorial focuses on building a Corrective RAG system using local resources, allowing for offline document evaluation and refinement processes.                                                                                                | [![AI Agent Code - Python](https://img.shields.io/static/v1?label=AI+Agent+Code&message=Python&color=%23244cd1)](https://github.com/langchain-ai/langgraph/blob/main/docs/docs/tutorials/rag/langgraph_crag_local.ipynb)       |
 | 🧠 **Self-RAG**               | 🧠 AI / Information Retrieval | Learn to implement Self-RAG, where the system reflects on its responses and retrieves additional information if necessary, enhancing the accuracy and relevance of generated content.                                                              | [![AI Agent Code - Python](https://img.shields.io/static/v1?label=AI+Agent+Code&message=Python&color=%23244cd1)](https://github.com/langchain-ai/langgraph/blob/main/docs/docs/tutorials/rag/langgraph_self_rag.ipynb)                       |
 | 🧠 **Self-RAG (Local)**       | 🧠 AI / Information Retrieval | This tutorial demonstrates how to implement Self-RAG using local models and data sources, enabling offline reflection and retrieval processes.                                                                                                     | [![AI Agent Code - Python](https://img.shields.io/static/v1?label=AI+Agent+Code&message=Python&color=%23244cd1)](https://github.com/langchain-ai/langgraph/blob/main/docs/docs/tutorials/rag/langgraph_self_rag_local.ipynb)         |
-
 
 
 
