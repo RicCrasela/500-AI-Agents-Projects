@@ -704,6 +704,91 @@
   els.signOutBtn.addEventListener("click", signOut);
   els.uploadBtn.addEventListener("click", uploadVideo);
 
+  // Profile UI refs
+  const profile = {
+    avatar: document.getElementById("profile-avatar"),
+    name: document.getElementById("profile-name"),
+    email: document.getElementById("profile-email"),
+    channel: document.getElementById("profile-channel"),
+    subs: document.getElementById("stat-subs"),
+    videos: document.getElementById("stat-videos"),
+    views: document.getElementById("stat-views"),
+    refresh: document.getElementById("refresh-profile"),
+    openChannel: document.getElementById("open-channel"),
+    signout2: document.getElementById("signout-2"),
+  };
+
+  const formatNumber = (n) => {
+    if (n == null) return "—";
+    const num = Number(n);
+    if (!Number.isFinite(num)) return String(n);
+    return Intl.NumberFormat("id-ID", { notation: "compact" }).format(num);
+  };
+
+  const fetchProfile = async () => {
+    if (!gapi?.client) return;
+    const auth = gapi.auth2?.getAuthInstance?.();
+    if (!auth || !auth.isSignedIn.get()) {
+      setProfileSignedOut();
+      return;
+    }
+    // Basic profile from Google user
+    const user = auth.currentUser.get();
+    const basic = user.getBasicProfile?.();
+    profile.name.textContent = basic?.getName?.() || "Pengguna";
+    profile.email.textContent = basic?.getEmail?.() || "—";
+    const imageUrl = basic?.getImageUrl?.();
+    if (imageUrl) profile.avatar.src = imageUrl;
+
+    // Channel stats
+    try {
+      const res = await gapi.client.youtube.channels.list({
+        mine: true,
+        part: "snippet,statistics",
+      });
+      const item = res.result.items?.[0];
+      if (item) {
+        const title = item.snippet?.title || "Channel";
+        const id = item.id;
+        profile.channel.textContent = `Channel: ${title}`;
+        profile.subs.textContent = formatNumber(item.statistics?.subscriberCount);
+        profile.videos.textContent = formatNumber(item.statistics?.videoCount);
+        profile.views.textContent = formatNumber(item.statistics?.viewCount);
+        profile.openChannel.disabled = !id;
+        if (id) {
+          profile.openChannel.onclick = () =>
+            window.open(`https://www.youtube.com/channel/${id}`, "_blank", "noopener,noreferrer");
+        }
+      } else {
+        profile.channel.textContent = "Channel: —";
+        profile.subs.textContent = "—";
+        profile.videos.textContent = "—";
+        profile.views.textContent = "—";
+        profile.openChannel.disabled = true;
+      }
+      profile.signout2.disabled = false;
+    } catch {
+      // If quota or permission missing
+      profile.channel.textContent = "Channel: (tidak dapat memuat)";
+      profile.openChannel.disabled = true;
+    }
+  };
+
+  const setProfileSignedOut = () => {
+    profile.name.textContent = "Belum masuk";
+    profile.email.textContent = "—";
+    profile.channel.textContent = "Channel: —";
+    profile.subs.textContent = "—";
+    profile.videos.textContent = "—";
+    profile.views.textContent = "—";
+    profile.avatar.removeAttribute("src");
+    profile.openChannel.disabled = true;
+    profile.signout2.disabled = true;
+  };
+
+  profile.refresh.addEventListener("click", fetchProfile);
+  profile.signout2.addEventListener("click", signOut);
+
   // In-app browser UI
   const webview = document.getElementById("webview");
   const browserUrl = document.getElementById("browser-url");

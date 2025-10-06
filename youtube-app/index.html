@@ -83,6 +83,30 @@
         <div class="upload__status" id="upload-status">Status: belum mulai</div>
       </section>
 
+      <section class="profile">
+        <div class="profile__header">
+          <img id="profile-avatar" class="profile__avatar" alt="avatar" />
+          <div class="profile__meta">
+            <div class="profile__name" id="profile-name">Belum masuk</div>
+            <div class="profile__email" id="profile-email">—</div>
+            <div class="profile__channel" id="profile-channel">Channel: —</div>
+          </div>
+          <div class="profile__actions">
+            <button id="refresh-profile">🔄 Refresh</button>
+            <button id="open-channel" disabled>📺 Buka Channel</button>
+            <button id="signout-2" disabled>🚪 Sign out</button>
+          </div>
+        </div>
+        <div class="profile__stats" id="profile-stats">
+          <div class="stat"><span id="stat-subs">—</span><small>Subscribers</small></div>
+          <div class="stat"><span id="stat-videos">—</span><small>Videos</small></div>
+          <div class="stat"><span id="stat-views">—</span><small>Views</small></div>
+        </div>
+        <div class="persist-note">
+          Info profil ditarik dari Google akun dan YouTube Data API (channels.list mine=true).
+        </div>
+      </section>
+
       <section class="browser">
         <div class="browser__toolbar">
           <input type="text" id="browser-url" placeholder="https://m.youtube.com/" value="https://m.youtube.com/" />
