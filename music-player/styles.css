@@ -131,3 +131,13 @@ footer.footer{color:var(--muted);font-size:12px;text-align:center;margin-top:8px
   background:linear-gradient(180deg, #101534, #0c112c);
   border:1px solid var(--border);border-radius:10px;
 }
+
+.notice{
+  display:none;
+  border:1px solid #5c2a2a;
+  background:#26161d;
+  color:#ffb3bf;
+  padding:10px 12px;border-radius:10px;
+  font-size:13px;
+}
+.notice.show{display:block}

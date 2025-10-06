@@ -1,9 +1,12 @@
 // Genie Music Player - vanilla JS
 (() => {
   const $ = (sel, root = document) => root.querySelector(sel);
-  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const $ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
   const audio = $('#audio');
+  audio.setAttribute('playsinline', '');
+  audio.preload = 'metadata';
+
   const playlistEl = $('#playlist');
   const fileInput = $('#fileInput');
   const urlForm = $('#urlForm');
@@ -11,6 +14,8 @@
   const dropZone = $('#dropZone');
   const searchInput = $('#searchInput');
   const filterFavBtn = $('#filterFav');
+  const addSampleBtn = $('#addSample');
+  const noticeEl = $('#notice');
 
   const btnShuffle = $('#btnShuffle');
   const btnPrev = $('#btnPrev');
@@ -31,6 +36,14 @@
 
   const canvas = $('#visualizer');
   const ctx = canvas.getContext('2d');
+
+  const showNotice = (msg) => {
+    if (!noticeEl) return;
+    noticeEl.textContent = msg;
+    noticeEl.classList.add('show');
+    clearTimeout(showNotice._t);
+    showNotice._t = setTimeout(() => noticeEl.classList.remove('show'), 6000);
+  };
 
   // State
   let state = {
@@ -102,6 +115,14 @@
     requestAnimationFrame(draw);
   };
   requestAnimationFrame(draw);
+
+  // Pastikan AudioContext aktif setelah interaksi pengguna agar visualizer bekerja
+  const tryResume = () => {
+    if (audioCtx.state !== 'running') {
+      audioCtx.resume().catch(() => {});
+    }
+  };
+  ['click','keydown','touchstart'].forEach(evt => window.addEventListener(evt, tryResume));
 
   // Helpers
   const formatTime = (sec) => {
@@ -207,8 +228,20 @@
     artistEl.textContent = current ? (current.artist || 'Unknown') : '—';
   };
 
+  const warnIfInsecureUrl = (urlStr) => {
+    try {
+      const u = new URL(urlStr, location.href);
+      if (location.protocol === 'https:' && u.protocol === 'http:') {
+        showNotice('URL non-HTTPS diblokir oleh browser (mixed content). Gunakan URL HTTPS.');
+        return true;
+      }
+    } catch {}
+    return false;
+  };
+
   const addUrl = (urlStr) => {
     try {
+      if (warnIfInsecureUrl(urlStr)) return;
       const u = new URL(urlStr);
       const name = decodeURIComponent(u.pathname.split('/').pop() || 'Unknown');
       const { artist, title } = computeArtistFromTitle(name.replace(/\.(mp3|ogg|m4a|aac|wav)$/i, ''));
@@ -280,11 +313,20 @@
   };
 
   const loadAtIndex = (idx) => {
-    if (id << 0 || idx >= state.items.length) return false;
+    if (idx < 0 || idx >= state.items.length) return false;
     state.index = idx;
     const it = state.items[idx];
     audio.src = it.src;
-    audio.play().catch(() => {});
+    tryResume();
+    audio.play().catch((err) => {
+      console.warn('Gagal memutar audio:', err);
+      const msg = String(err && err.name ? err.name : err || '');
+      if (/NotAllowedError/i.test(msg)) {
+        showNotice('Pemutaran diblokir kebijakan autoplay. Klik halaman lalu tekan Play lagi.');
+      } else {
+        showNotice('Gagal memutar audio. Pastikan URL valid, mendukung CORS & HTTPS, atau coba file lokal.');
+      }
+    });
     audio.dispatchEvent(new Event('play')); // force visual updates
     render();
     return true;
@@ -300,7 +342,17 @@
       if (state.items.length) loadAtIndex(0);
       return;
     }
-    if (audio.paused) audio.play();
+    if (audio.paused) {
+      tryResume();
+      audio.play().catch(err => {
+        const msg = String(err && err.name ? err.name : err || '');
+        if (/NotAllowedError/i.test(msg)) {
+          showNotice('Pemutaran diblokir. Klik sekali di halaman lalu tekan Play lagi.');
+        } else {
+          showNotice('Tidak dapat memutar audio. Coba file lokal atau URL HTTPS lain.');
+        }
+      });
+    }
     else audio.pause();
   };
 
@@ -338,9 +390,27 @@
   fileInput.addEventListener('change', (e) => addFiles(e.target.files));
   urlForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    addUrl(urlInput.value.trim());
+    const val = urlInput.value.trim();
+    if (warnIfInsecureUrl(val)) return;
+    addUrl(val);
     urlInput.value = '';
   });
+
+  // Tambah contoh lagu (HTTPS + CORS-friendly)
+  if (addSampleBtn) {
+    addSampleBtn.addEventListener('click', () => {
+      const samples = [
+        { url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', title: 'SoundHelix - Song 1', artist: 'SoundHelix' },
+        { url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', title: 'SoundHelix - Song 2', artist: 'SoundHelix' },
+      ];
+      samples.forEach(s => {
+        state.items.push({ id: uid(), srcType: 'url', src: s.url, title: s.title, artist: s.artist, favorite: false });
+      });
+      saveState();
+      render();
+      if (state.index === -1) loadAtIndex(0);
+    });
+  }
 
   // Drag & drop
   ;['dragenter','dragover'].forEach(evt => dropZone.addEventListener(evt, (e) => {
@@ -415,6 +485,16 @@
     if (state.repeat === 'one') { audio.currentTime = 0; audio.play(); return; }
     next();
   });
+  audio.addEventListener('error', () => {
+    const code = audio.error && audio.error.code;
+    let msg = 'Terjadi kesalahan saat memuat/memutar audio.';
+    if (code === 2) msg = 'Jaringan bermasalah saat memuat audio.';
+    if (code === 3) msg = 'Format file tidak didukung atau rusak.';
+    if (code === 4) msg = 'Sumber audio tidak ditemukan/ditolak (CORS/HTTPS?).';
+    showNotice(msg + ' Coba gunakan file lokal atau URL HTTPS lain.');
+  });
+  audio.addEventListener('stalled', () => showNotice('Pemutaran tertunda (stalled). Periksa koneksi atau coba lagi.'));
+  audio.addEventListener('suspend', () => {/* ignore but could log */});
 
   // Keyboard shortcuts
   window.addEventListener('keydown', (e) => {
