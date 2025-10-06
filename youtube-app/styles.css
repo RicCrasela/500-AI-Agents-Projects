@@ -99,6 +99,36 @@ body[data-theme="light"] {
   background: linear-gradient(180deg, rgba(143,101,255,0.25), rgba(255,255,255,0.02));
 }
 
+/* Section titles */
+.section-title {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 2px;
+}
+
+/* Light theme inputs */
+body[data-theme="light"] .search__toolbar input,
+body[data-theme="light"] .upload__toolbar input,
+body[data-theme="light"] .upload__form input,
+body[data-theme="light"] .upload__form select,
+body[data-theme="light"] .settings__grid input,
+body[data-theme="light"] .settings__grid select {
+  background: #fff;
+  border-color: rgba(0,0,0,0.1);
+}
+
 .app__header {
   display: flex;
   align-items: baseline;
