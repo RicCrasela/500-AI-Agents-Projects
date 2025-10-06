@@ -498,6 +498,14 @@
     currentIndex = index;
     const track = playlist[currentIndex];
     player.loadVideoById(track.id);
+    // Autoplay on select if enabled and user has interacted or banner disabled
+    if (settings.autoplayOnSelect && (userInteracted || !settings.showAutoplayBanner)) {
+      try {
+        player.playVideo();
+      } catch {
+        // ignore
+      }
+    }
     updateNowPlaying(track);
     renderPlaylist();
     updatePlayButton();
@@ -953,6 +961,7 @@
     defaultPrivacy: "private",
     rememberBrowserURL: false,
     showAutoplayBanner: true,
+    autoplayOnSelect: false,
   };
   let settings = { ...defaultSettings };
 
@@ -997,6 +1006,7 @@
       privacy: document.getElementById("set-privacy"),
       remember: document.getElementById("set-remember-url"),
       autoplayBanner: document.getElementById("set-autoplay-banner"),
+      autoplaySelect: document.getElementById("set-autoplay-select"),
       save: document.getElementById("settings-save"),
       reset: document.getElementById("settings-reset"),
     };
@@ -1011,6 +1021,7 @@
     el.privacy.value = settings.defaultPrivacy || "private";
     el.remember.checked = !!settings.rememberBrowserURL;
     if (el.autoplayBanner) el.autoplayBanner.checked = !!settings.showAutoplayBanner;
+    if (el.autoplaySelect) el.autoplaySelect.checked = !!settings.autoplayOnSelect;
 
     el.save.onclick = () => {
       settings.theme = el.theme.value;
@@ -1022,6 +1033,7 @@
       settings.defaultPrivacy = el.privacy.value;
       settings.rememberBrowserURL = !!el.remember.checked;
       settings.showAutoplayBanner = !!(el.autoplayBanner?.checked);
+      settings.autoplayOnSelect = !!(el.autoplaySelect?.checked);
 
       applyTheme(settings.theme);
       els.volume.value = String(Math.max(0, Math.min(100, settings.defaultVolume)));
