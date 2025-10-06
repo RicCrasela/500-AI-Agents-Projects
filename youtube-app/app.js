@@ -20,6 +20,7 @@
   let apiKey = "";
   let clientId = localStorage.getItem("youtube_client_id") || "";
   let isSignedIn = false;
+  let userInteracted = false;
 
   // Elements
   const els = {
@@ -110,6 +111,10 @@
     }
     // Prefill settings UI
     populateSettingsUI();
+
+    // Show autoplay banner until user interacts
+    showAutoplayBanner();
+    attachAutoplayUnlock();
   };
 
   const onPlayerStateChange = (event) => {
@@ -117,6 +122,7 @@
     if (event.data === YT.PlayerState.PLAYING) {
       updatePlayButton();
       startProgressTimer();
+      hideAutoplayBanner();
     } else if (event.data === YT.PlayerState.PAUSED) {
       updatePlayButton();
       stopProgressTimer();
@@ -687,6 +693,36 @@
       e.target.value = "";
     }
   });
+
+  // Autoplay unlock helpers
+  const bannerEl = document.getElementById("autoplay-banner");
+  const showAutoplayBanner = () => {
+    if (bannerEl) bannerEl.classList.add("show");
+  };
+  const hideAutoplayBanner = () => {
+    if (bannerEl) bannerEl.classList.remove("show");
+  };
+  const onFirstUserInteract = () => {
+    if (userInteracted) return;
+    userInteracted = true;
+    hideAutoplayBanner();
+    try {
+      if (player && player.getPlayerState() !== YT.PlayerState.PLAYING) {
+        player.playVideo();
+      }
+    } catch {
+      // ignore
+    }
+    detachAutoplayUnlock();
+  };
+  const attachAutoplayUnlock = () => {
+    document.addEventListener("click", onFirstUserInteract, { once: true });
+    document.addEventListener("touchstart", onFirstUserInteract, { once: true });
+    document.addEventListener("keydown", onFirstUserInteract, { once: true });
+    if (bannerEl) {
+      bannerEl.addEventListener("click", onFirstUserInteract, { once: true });
+      bannerEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") });
 
   els.exportBtn.addEventListener("click", exportPlaylist);
 

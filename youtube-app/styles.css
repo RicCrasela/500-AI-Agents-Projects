@@ -63,6 +63,25 @@ body[data-theme="light"] {
   border-radius: 12px;
   box-shadow: var(--shadow);
 }
+
+/* Autoplay banner */
+.banner {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 8px 0 12px;
+  background: linear-gradient(90deg, rgba(94,155,255,0.25), rgba(143,101,255,0.25));
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.banner.show {
+  display: flex;
+}
 .menu__item {
   display: inline-block;
   padding: 8px 10px;
