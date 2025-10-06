@@ -24,6 +24,7 @@
         <a href="#profile-sec" class="menu__item">Profil</a>
         <a href="#browser-sec" class="menu__item">Browser</a>
         <a href="#playlist-sec" class="menu__item">Playlist</a>
+        <a href="#settings-sec" class="menu__item">Settings</a>
         <a href="../music-player/index.html" class="menu__item" target="_blank" rel="noopener">Music App ↗</a>
       </nav>
 
@@ -146,6 +147,56 @@
         <div class="persist-note">
           Playlist tersimpan otomatis (localStorage). Tambah video menggunakan URL YouTube atau ID video.
           Anda juga bisa import/export playlist dalam format JSON.
+        </div>
+      </section>
+
+      <section class="settings" id="settings-sec">
+        <h2>Pengaturan</h2>
+        <div class="settings__grid">
+          <label>Theme
+            <select id="set-theme">
+              <option value="dark">dark</option>
+              <option value="light">light</option>
+              <option value="system">system</option>
+            </select>
+          </label>
+          <label>Default volume
+            <input type="range" id="set-volume" min="0" max="100" value="80" />
+          </label>
+          <label>Keyboard shortcuts
+            <input type="checkbox" id="set-hotkeys" checked />
+          </label>
+          <label>Search regionCode
+            <input type="text" id="set-region" placeholder="contoh: ID" />
+          </label>
+          <label>Search order
+            <select id="set-order">
+              <option value="relevance">relevance</option>
+              <option value="date">date</option>
+              <option value="viewCount">viewCount</option>
+              <option value="rating">rating</option>
+            </select>
+          </label>
+          <label>Search maxResults
+            <input type="number" id="set-max" min="5" max="50" value="20" />
+          </label>
+          <label>Default upload privacy
+            <select id="set-privacy">
+              <option value="private">private</option>
+              <option value="unlisted">unlisted</option>
+              <option value="public">public</option>
+            </select>
+          </label>
+          <label>Remember browser URL
+            <input type="checkbox" id="set-remember-url" />
+          </label>
+        </div>
+        <div class="settings__actions">
+          <button id="settings-save">💾 Simpan</button>
+          <button id="settings-reset">↺ Reset</button>
+        </div>
+        <div class="persist-note">
+          Pengaturan disimpan di localStorage dan diterapkan ke pencarian, upload, volume, dan tampilan.
         </div>
       </section>
 

@@ -26,6 +26,21 @@ body {
     linear-gradient(180deg, #0c0e18, #15182a);
 }
 
+/* Light theme overrides */
+body[data-theme="light"] {
+  --bg: #f5f7fb;
+  --bg-2: #ffffff;
+  --text: #1e2330;
+  --muted: #5e667a;
+  --accent: #6b4cff;
+  --accent-2: #2e6bff;
+  background:
+    radial-gradient(1200px 600px at 10% 10%, rgba(46,107,255,0.10), transparent 40%),
+    radial-gradient(1200px 600px at 90% 10%, rgba(107,76,255,0.10), transparent 40%),
+    radial-gradient(1200px 600px at 50% 90%, rgba(106,227,154,0.10), transparent 40%),
+    linear-gradient(180deg, #edf1fb, #f8faff);
+}
+
 .app {
   max-width: 1000px;
   margin: 0 auto;
@@ -379,6 +394,41 @@ button.active {
   padding: 16px;
   box-shadow: var(--shadow);
   margin-bottom: 18px;
+}
+
+/* Settings */
+.settings {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+.settings__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+.settings__grid label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.settings__grid input, .settings__grid select {
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  padding: 0 10px;
+}
+.settings__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
 }
 .profile__header {
   display: grid;

@@ -79,14 +79,37 @@
   };
 
   const onPlayerReady = () => {
+    // Load settings first to apply defaults
+    loadSettings();
+    applyTheme(settings.theme);
+    const initialVol = Number.isFinite(Number(settings.defaultVolume)) ? Number(settings.defaultVolume) : Number(els.volume.value);
+    els.volume.value = String(Math.max(0, Math.min(100, initialVol)));
     setVolume(els.volume.value);
+
     apiKey = localStorage.getItem("youtube_api_key") || "";
     if (apiKey) els.apiKeyInput.value = apiKey;
-    if (clientId) els.clientIdInput.value = clientId;
+
+    // Remember browser URL
+    if (settings.rememberBrowserURL) {
+      const savedURL = localStorage.getItem("yt_browser_url");
+      if (savedURL) {
+        const input = document.getElementById("browser-url");
+        const iframe = document.getElementById("webview");
+        if (input) input.value = savedURL;
+        if (iframe) iframe.src = savedURL;
+      }
+    }
+
     loadPersistedPlaylist();
     renderPlaylist();
     // Init GAPI after iframe API ready to avoid race on global callbacks
     initGapiClient();
+    // Prefill upload privacy default
+    if (settings.defaultPrivacy) {
+      els.videoPrivacy.value = settings.defaultPrivacy;
+    }
+    // Prefill settings UI
+    populateSettingsUI();
   };
 
   const onPlayerStateChange = (event) => {
@@ -189,7 +212,13 @@
       q: query,
       part: "snippet",
       type: "video",
-      maxResults: "20",
+      maxResults: String(settings.maxResults || 20),
+      order: settings.order || "relevance",
+      regionCode: settings.regionCode || undefined,
+    });
+    // Remove undefined params
+    Array.from(params.keys()).forEach(k => {
+      if (params.get(k) === "undefined") params.delete(k);
     });
     const url = `https://www.googleapis.com/youtube/v3/search?${params.toString()}`;
     try {
@@ -792,13 +821,20 @@
   // In-app browser UI
   const webview = document.getElementById("webview");
   const browserUrl = document.getElementById("browser-url");
+  const rememberURL = () => {
+    if (settings.rememberBrowserURL) {
+      localStorage.setItem("yt_browser_url", (browserUrl.value || "").trim());
+    }
+  };
   document.getElementById("open-iframe").addEventListener("click", () => {
     const url = (browserUrl.value || "").trim() || "https://m.youtube.com/";
     webview.src = url;
+    rememberURL();
   });
   document.getElementById("open-tab").addEventListener("click", () => {
     const url = (browserUrl.value || "").trim() || "https://m.youtube.com/";
     window.open(url, "_blank", "noopener,noreferrer");
+    rememberURL();
   });
 
   // Smooth scroll + menu active state
@@ -841,6 +877,7 @@
 
   // Keyboard shortcuts
   window.addEventListener("keydown", (e) => {
+    if (!settings.enableHotkeys) return;
     if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
     switch (e.key) {
       case " ":
@@ -863,4 +900,44 @@
         break;
     }
   });
-})();
+
+  // Settings
+  const defaultSettings = {
+    theme: "dark",
+    defaultVolume: 80,
+    enableHotkeys: true,
+    regionCode: "",
+    order: "relevance",
+    maxResults: 20,
+    defaultPrivacy: "private",
+    rememberBrowserURL: false,
+  };
+  let settings = { ...defaultSettings };
+
+  const loadSettings = () => {
+    try {
+      const raw = localStorage.getItem("yt_app_settings");
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data && typeof data === "object") {
+        settings = { ...settings, ...data };
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const saveSettings = () => {
+    localStorage.setItem("yt_app_settings", JSON.stringify(settings));
+  };
+
+  const applyTheme = (theme) => {
+    const t = theme || "dark";
+    if (t === "light") {
+      document.body.setAttribute("data-theme", "light");
+    } else if (t === "system") {
+      const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
+      document.body.setAttribute("data-theme", prefersLight ? "light" : "");
+      if (!prefersLight) document.body.removeAttribute("data-theme");
+    } else {
+      document.body.removeAttribute("
