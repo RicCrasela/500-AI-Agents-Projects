@@ -1,8 +1,9 @@
 /**
- * YouTube Player App (no Data API key required).
+ * YouTube Player App with Search (Data API v3).
  * - Adds videos by URL or ID
  * - Persists playlist via localStorage
  * - Import/Export playlist (JSON)
+ * - Search videos using API key (stored in localStorage)
  * - Uses YouTube IFrame API for playback control
  */
 
@@ -15,6 +16,7 @@
   let player = null;
   let progressTimer = null;
   let isSeeking = false;
+  let apiKey = "";
 
   // Elements
   const els = {
@@ -37,6 +39,11 @@
     exportBtn: document.getElementById("export"),
     clear: document.getElementById("clear"),
     playlist: document.getElementById("playlist"),
+    searchQuery: document.getElementById("search-query"),
+    apiKeyInput: document.getElementById("api-key"),
+    saveKey: document.getElementById("save-key"),
+    searchBtn: document.getElementById("search-btn"),
+    searchResults: document.getElementById("search-results"),
   };
 
   // YouTube IFrame API bootstrapping
@@ -60,6 +67,8 @@
 
   const onPlayerReady = () => {
     setVolume(els.volume.value);
+    apiKey = localStorage.getItem("youtube_api_key") || "";
+    if (apiKey) els.apiKeyInput.value = apiKey;
     loadPersistedPlaylist();
     renderPlaylist();
   };
@@ -125,7 +134,6 @@
       if (u.hostname.includes("youtube.com")) {
         const v = u.searchParams.get("v");
         if (v) return v;
-        // short urls like /watch?v=ID or share formats
         const pathnameParts = u.pathname.split("/").filter(Boolean);
         if (pathnameParts[0] === "embed" && pathnameParts[1]) return pathnameParts[1];
       } else if (u.hostname.includes("youtu.be")) {
@@ -142,7 +150,6 @@
     `https://img.youtube.com/vi/${encodeURIComponent(id)}/hqdefault.jpg`;
 
   const deriveTitle = async (id) => {
-    // Try oEmbed (may be blocked by CORS in some environments). Fallback to ID.
     const url = `https://www.youtube.com/oembed?url=${encodeURIComponent(`https://www.youtube.com/watch?v=${id}`)}&format=json`;
     try {
       const res = await fetch(url);
@@ -152,6 +159,77 @@
     } catch {
       return id;
     }
+  };
+
+  // Search
+  const searchYouTube = async (query) => {
+    const key = apiKey || els.apiKeyInput.value.trim();
+    if (!key) {
+      alert("Masukkan YouTube API Key terlebih dahulu.");
+      return;
+    }
+    const params = new URLSearchParams({
+      key,
+      q: query,
+      part: "snippet",
+      type: "video",
+      maxResults: "20",
+    });
+    const url = `https://www.googleapis.com/youtube/v3/search?${params.toString()}`;
+    try {
+      els.searchResults.innerHTML = "";
+      const res = await fetch(url);
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || "Request gagal");
+      }
+      const data = await res.json();
+      const items = Array.isArray(data.items) ? data.items : [];
+      renderSearchResults(items);
+    } catch (e) {
+      alert("Gagal mencari: " + (e?.message || "unknown error"));
+    }
+  };
+
+  const renderSearchResults = (items) => {
+    els.searchResults.innerHTML = "";
+    items.forEach((item) => {
+      const id = item.id?.videoId;
+      const sn = item.snippet || {};
+      if (!id) return;
+
+      const li = document.createElement("li");
+      li.className = "result";
+
+      const img = document.createElement("img");
+      img.className = "result__thumb";
+      img.src = sn.thumbnails?.medium?.url || thumbURL(id);
+      img.alt = "thumbnail";
+
+      const meta = document.createElement("div");
+      meta.className = "result__meta";
+
+      const title = document.createElement("div");
+      title.className = "result__title";
+      title.textContent = sn.title || id;
+
+      const channel = document.createElement("div");
+      channel.className = "result__channel";
+      channel.textContent = sn.channelTitle || "Tidak diketahui";
+
+      const addBtn = document.createElement("button");
+      addBtn.textContent = "➕ Tambah";
+      addBtn.addEventListener("click", async () => {
+        await addTrack({ id, title: sn.title });
+      });
+
+      meta.appendChild(title);
+      meta.appendChild(channel);
+      li.appendChild(img);
+      li.appendChild(meta);
+      li.appendChild(addBtn);
+      els.searchResults.appendChild(li);
+    });
   };
 
   // Playlist ops
@@ -218,7 +296,6 @@
         alert("Format file tidak valid.");
         return;
       }
-      // Replace playlist
       playlist = [];
       for (const item of data.items) {
         if (item && item.id) {
@@ -444,6 +521,24 @@
     if (confirm("Bersihkan seluruh playlist?")) {
       clearPlaylist();
     }
+  });
+
+  // Search UI
+  els.saveKey.addEventListener("click", () => {
+    const val = els.apiKeyInput.value.trim();
+    if (!val) {
+      alert("Isi API key terlebih dahulu.");
+      return;
+    }
+    apiKey = val;
+    localStorage.setItem("youtube_api_key", apiKey);
+    alert("API key disimpan.");
+  });
+
+  els.searchBtn.addEventListener("click", () => {
+    const q = els.searchQuery.value.trim();
+    if (!q) return;
+    searchYouTube(q);
   });
 
   // Keyboard shortcuts

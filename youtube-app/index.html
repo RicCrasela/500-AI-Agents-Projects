@@ -49,6 +49,19 @@
         </div>
       </section>
 
+      <section class="search">
+        <div class="search__toolbar">
+          <input type="text" id="search-query" placeholder="Cari video YouTube..." />
+          <input type="password" id="api-key" placeholder="YouTube API Key" />
+          <button id="save-key">🔑 Simpan Key</button>
+          <button id="search-btn">🔎 Cari</button>
+        </div>
+        <ul id="search-results" class="results__list" aria-live="polite" aria-label="Hasil pencarian"></ul>
+        <div class="persist-note">
+          API key disimpan di browser Anda (localStorage). Anda bisa membuat API Key di Google Cloud Console.
+        </div>
+      </section>
+
       <section class="playlist">
         <div class="playlist__toolbar">
           <button id="add-url">🔗 Tambah URL/ID</button>
@@ -71,7 +84,9 @@
           Dibuat dengan YouTube IFrame API.
         </div>
         <div class="footer__right">
-          <a href="https://developers.google.com/youtube/iframe_api_reference" target="_blank" rel="noopener">Docs API</a>
+          <a href="https://developers.google.com/youtube/iframe_api_reference" target="_blank" rel="noopener">Docs IFrame API</a>
+          ·
+          <a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank" rel="noopener">Docs Data API (Search)</a>
         </div>
       </footer>
     </div>
