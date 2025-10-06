@@ -321,3 +321,25 @@ This repository is licensed under the MIT License. See the [LICENSE](LICENSE) fi
 ## 🚀 Let's Build Together!
 
 Feel free to share this repository with your network and star ⭐ it if you find it useful. Let’s collaborate to create the ultimate resource for AI agent use cases!
+
+---
+
+## 🎵 Genie Music Player (Web App)
+
+Aplikasi musik berbasis web dengan fitur lengkap: playlist, favorit, pencarian, shuffle, repeat, volume, seek, keyboard shortcuts, drag-and-drop upload, import/export playlist (URL), serta visualizer audio.
+
+- Lokasi: music-player/index.html
+- Cara menjalankan:
+  1) Buka file berikut di browser Anda: [music-player/index.html](music-player/index.html)
+  2) Tambahkan file audio (drag & drop atau tombol “Tambah File Audio”) atau tempel URL audio.
+- Fitur utama:
+  - Playlist dengan pencarian dan filter favorit
+  - Shuffle dan Repeat (Off/All/One)
+  - Next/Prev, seek bar, volume dan mute
+  - Keyboard shortcuts: Space (Play/Pause), ←/→ (Seek), ↑/↓ (Volume), N (Next), P (Prev), S (Shuffle), R (Repeat), M (Mute)
+  - Import/Export playlist (berbasis URL) ke/dari JSON
+  - Visualizer menggunakan Web Audio API
+  - Penyimpanan pengaturan (shuffle, repeat, volume) dan playlist URL di localStorage
+
+Catatan:
+- File lokal yang diunggah hanya disimpan untuk sesi saat ini (keamanan browser tidak mengizinkan penyimpanan file lokal permanen). Playlist yang diekspor berisi item berjenis URL.
