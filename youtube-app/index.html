@@ -62,6 +62,27 @@
         </div>
       </section>
 
+      <section class="upload">
+        <div class="upload__toolbar">
+          <input type="text" id="client-id" placeholder="Google OAuth Client ID" />
+          <button id="save-client">💾 Simpan Client ID</button>
+          <button id="auth">🔐 Sign in</button>
+          <button id="signout">🚪 Sign out</button>
+        </div>
+        <div class="upload__form">
+          <input type="file" id="video-file" accept="video/*" />
+          <input type="text" id="video-title" placeholder="Judul video" />
+          <input type="text" id="video-desc" placeholder="Deskripsi video" />
+          <select id="video-privacy">
+            <option value="private">private</option>
+            <option value="unlisted">unlisted</option>
+            <option value="public">public</option>
+          </select>
+          <button id="upload-btn">⤴️ Upload ke YouTube</button>
+        </div>
+        <div class="upload__status" id="upload-status">Status: belum mulai</div>
+      </section>
+
       <section class="playlist">
         <div class="playlist__toolbar">
           <button id="add-url">🔗 Tambah URL/ID</button>
@@ -87,11 +108,14 @@
           <a href="https://developers.google.com/youtube/iframe_api_reference" target="_blank" rel="noopener">Docs IFrame API</a>
           ·
           <a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank" rel="noopener">Docs Data API (Search)</a>
+          ·
+          <a href="https://developers.google.com/youtube/v3/docs/videos/insert" target="_blank" rel="noopener">Docs Upload</a>
         </div>
       </footer>
     </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

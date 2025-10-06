@@ -1,9 +1,10 @@
 /**
- * YouTube Player App with Search (Data API v3).
+ * YouTube Player App with Search + Upload (Data API v3).
  * - Adds videos by URL or ID
  * - Persists playlist via localStorage
  * - Import/Export playlist (JSON)
  * - Search videos using API key (stored in localStorage)
+ * - Upload video using OAuth 2.0 (Client ID required)
  * - Uses YouTube IFrame API for playback control
  */
 
@@ -17,6 +18,8 @@
   let progressTimer = null;
   let isSeeking = false;
   let apiKey = "";
+  let clientId = localStorage.getItem("youtube_client_id") || "";
+  let isSignedIn = false;
 
   // Elements
   const els = {
@@ -44,6 +47,16 @@
     saveKey: document.getElementById("save-key"),
     searchBtn: document.getElementById("search-btn"),
     searchResults: document.getElementById("search-results"),
+    clientIdInput: document.getElementById("client-id"),
+    saveClient: document.getElementById("save-client"),
+    authBtn: document.getElementById("auth"),
+    signOutBtn: document.getElementById("signout"),
+    videoFile: document.getElementById("video-file"),
+    videoTitle: document.getElementById("video-title"),
+    videoDesc: document.getElementById("video-desc"),
+    videoPrivacy: document.getElementById("video-privacy"),
+    uploadBtn: document.getElementById("upload-btn"),
+    uploadStatus: document.getElementById("upload-status"),
   };
 
   // YouTube IFrame API bootstrapping
@@ -69,8 +82,11 @@
     setVolume(els.volume.value);
     apiKey = localStorage.getItem("youtube_api_key") || "";
     if (apiKey) els.apiKeyInput.value = apiKey;
+    if (clientId) els.clientIdInput.value = clientId;
     loadPersistedPlaylist();
     renderPlaylist();
+    // Init GAPI after iframe API ready to avoid race on global callbacks
+    initGapiClient();
   };
 
   const onPlayerStateChange = (event) => {
@@ -230,6 +246,134 @@
       li.appendChild(addBtn);
       els.searchResults.appendChild(li);
     });
+  };
+
+  // Upload (OAuth)
+  const initGapiClient = () => {
+    if (!window.gapi) return;
+    gapi.load("client:auth2", async () => {
+      try {
+        await gapi.client.init({
+          apiKey: apiKey || els.apiKeyInput.value.trim() || undefined,
+          clientId: clientId || undefined,
+          scope: "https://www.googleapis.com/auth/youtube.upload",
+          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest"],
+        });
+        const auth = gapi.auth2.getAuthInstance();
+        isSignedIn = auth.isSignedIn.get();
+        updateAuthUI();
+        auth.isSignedIn.listen((val) => {
+          isSignedIn = val;
+          updateAuthUI();
+        });
+      } catch (e) {
+        // Initialization may fail until clientId is set
+      }
+    });
+  };
+
+  const updateAuthUI = () => {
+    els.authBtn.textContent = isSignedIn ? "✅ Signed in" : "🔐 Sign in";
+    els.authBtn.disabled = !clientId;
+    els.signOutBtn.disabled = !isSignedIn;
+    els.uploadBtn.disabled = !isSignedIn;
+  };
+
+  const signIn = async () => {
+    if (!clientId) {
+      alert("Masukkan Client ID terlebih dahulu.");
+      return;
+    }
+    try {
+      await gapi.auth2.getAuthInstance().signIn();
+    } catch (e) {
+      alert("Gagal sign in: " + (e?.error || e?.message || "unknown"));
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      await gapi.auth2.getAuthInstance().signOut();
+    } catch {
+      // ignore
+    }
+  };
+
+  const uploadVideo = async () => {
+    const file = els.videoFile.files?.[0];
+    if (!file) {
+      alert("Pilih file video terlebih dahulu.");
+      return;
+    }
+    if (!isSignedIn) {
+      alert("Silakan sign in terlebih dahulu.");
+      return;
+    }
+    const title = els.videoTitle.value.trim() || file.name;
+    const description = els.videoDesc.value.trim();
+    const privacyStatus = els.videoPrivacy.value || "private";
+
+    els.uploadStatus.textContent = "Memulai upload (resumable)...";
+
+    // Step 1: Create a resumable upload session
+    const token = gapi.client.getToken()?.access_token;
+    if (!token) {
+      alert("Token tidak tersedia. Pastikan sudah sign in.");
+      return;
+    }
+
+    const metadata = {
+      snippet: { title, description },
+      status: { privacyStatus },
+    };
+
+    try {
+      const startRes = await fetch("https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json; charset=UTF-8",
+          "X-Upload-Content-Length": String(file.size),
+          "X-Upload-Content-Type": file.type || "video/*",
+        },
+        body: JSON.stringify(metadata),
+      });
+
+      if (!startRes.ok) {
+        const text = await startRes.text();
+        throw new Error(text || "Gagal membuat sesi upload");
+      }
+
+      const sessionUrl = startRes.headers.get("Location");
+      if (!sessionUrl) throw new Error("Tidak ada URL sesi upload");
+
+      els.uploadStatus.textContent = "Mengunggah video...";
+
+      // Step 2: Upload file bytes
+      const uploadRes = await fetch(sessionUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.type || "video/*",
+          "Content-Length": String(file.size),
+        },
+        body: file,
+      });
+
+      if (!uploadRes.ok) {
+        const text = await uploadRes.text();
+        throw new Error(text || "Upload gagal");
+      }
+
+      const result = await uploadRes.json();
+      els.uploadStatus.textContent = `Selesai. Video ID: ${result.id || "(unknown)"}`;
+
+      // Optional: add to playlist immediately
+      if (result.id) {
+        await addTrack({ id: result.id, title });
+      }
+    } catch (e) {
+      els.uploadStatus.textContent = "Error: " + (e?.message || "unknown");
+    }
   };
 
   // Playlist ops
@@ -533,6 +677,7 @@
     apiKey = val;
     localStorage.setItem("youtube_api_key", apiKey);
     alert("API key disimpan.");
+    initGapiClient(); // re-init with API key
   });
 
   els.searchBtn.addEventListener("click", () => {
@@ -540,6 +685,24 @@
     if (!q) return;
     searchYouTube(q);
   });
+
+  // Upload UI
+  els.saveClient.addEventListener("click", () => {
+    const val = els.clientIdInput.value.trim();
+    if (!val) {
+      alert("Isi Client ID terlebih dahulu.");
+      return;
+    }
+    clientId = val;
+    localStorage.setItem("youtube_client_id", clientId);
+    initGapiClient();
+    updateAuthUI();
+    alert("Client ID disimpan.");
+  });
+
+  els.authBtn.addEventListener("click", signIn);
+  els.signOutBtn.addEventListener("click", signOut);
+  els.uploadBtn.addEventListener("click", uploadVideo);
 
   // Keyboard shortcuts
   window.addEventListener("keydown", (e) => {
