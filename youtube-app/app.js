@@ -801,6 +801,44 @@
     window.open(url, "_blank", "noopener,noreferrer");
   });
 
+  // Smooth scroll + menu active state
+  const menu = document.getElementById("menu");
+  if (menu) {
+    const items = Array.from(menu.querySelectorAll(".menu__item")).filter(a => a.hash);
+    const sections = items.map(a => document.querySelector(a.hash)).filter(Boolean);
+
+    const setActive = (hash) => {
+      items.forEach(a => a.classList.toggle("active", a.hash === hash));
+    };
+
+    items.forEach((a) => {
+      a.addEventListener("click", (e) => {
+        if (!a.hash) return;
+        const target = document.querySelector(a.hash);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+          setActive(a.hash);
+        }
+      });
+    });
+
+    const onScroll = () => {
+      const y = window.scrollY + 100;
+      let activeHash = items[0]?.hash;
+      sections.forEach((sec, idx) => {
+        const rect = sec.getBoundingClientRect();
+        const top = rect.top + window.scrollY;
+        if (y >= top) {
+          activeHash = items[idx].hash;
+        }
+      });
+      setActive(activeHash);
+    };
+    window.addEventListener("scroll", onScroll);
+    onScroll();
+  }
+
   // Keyboard shortcuts
   window.addEventListener("keydown", (e) => {
     if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;

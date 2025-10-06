@@ -32,6 +32,39 @@ body {
   padding: 32px 20px 40px;
 }
 
+/* Top menu */
+.menu {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 0 0 16px;
+  background: rgba(15,18,32,0.85);
+  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+.menu__item {
+  display: inline-block;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: var(--text);
+  text-decoration: none;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+}
+.menu__item:hover {
+  border-color: rgba(255,255,255,0.18);
+}
+.menu__item.active {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, rgba(143,101,255,0.25), rgba(255,255,255,0.02));
+}
+
 .app__header {
   display: flex;
   align-items: baseline;
