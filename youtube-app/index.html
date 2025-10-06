@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>YouTube Player</title>
+    <meta name="description" content="A simple YouTube playlist app using the IFrame Player API." />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app__header">
+        <h1>▶️ YouTube Player</h1>
+        <p class="subtitle">Putar daftar video YouTube dengan kontrol play/pause, seek, volume, shuffle, repeat.</p>
+      </header>
+
+      <div id="autoplay-banner" class="banner" role="button" tabindex="0" aria-label="Klik untuk mengaktifkan audio">
+        🔊 Klik di sini untuk mengaktifkan audio pemutaran
+      </div>
+
+      <nav class="menu" id="menu">
+        <a href="#player-sec" class="menu__item active">Player</a>
+        <a href="#search-sec" class="menu__item">Search</a>
+        <a href="#upload-sec" class="menu__item">Upload</a>
+        <a href="#profile-sec" class="menu__item">Profil</a>
+        <a href="#browser-sec" class="menu__item">Browser</a>
+        <a href="#playlist-sec" class="menu__item">Playlist</a>
+        <a href="#settings-sec" class="menu__item">Settings</a>
+        <a href="../music-player/index.html" class="menu__item" target="_blank" rel="noopener">Music App ↗</a>
+      </nav>
+
+      <section class="controls" id="player-sec">
+        <h2 class="section-title">Player</h2>
+        <div class="now">
+          <div class="cover" id="cover" aria-hidden="true"></div>
+          <div class="now__meta">
+            <div class="now__title" id="now-title">Tidak ada video</div>
+            <div class="now__artist" id="now-artist">YouTube</div>
+          </div>
+        </div>
+
+        <div class="transport">
+          <div class="player">
+            <div id="player" class="player__iframe" aria-label="YouTube player"></div>
+          </div>
+
+          <div class="time">
+            <span id="current-time">00:00</span>
+            <input type="range" id="progress" min="0" max="100" value="0" aria-label="Seek" />
+            <span id="duration">00:00</span>
+          </div>
+
+          <div class="buttons">
+            <button id="prev" title="Sebelumnya" aria-label="Sebelumnya">⏮</button>
+            <button id="play" title="Putar/Jeda" aria-label="Putar/Jeda">⏯</button>
+            <button id="next" title="Berikutnya" aria-label="Berikutnya">⏭</button>
+            <button id="shuffle" title="Acak" aria-label="Acak">🔀</button>
+            <button id="repeat" title="Ulangi (Off → Satu → Semua)" aria-label="Ulangi">🔁</button>
+            <button id="mute" title="Bisu" aria-label="Bisu">🔇</button>
+            <input type="range" id="volume" min="0" max="100" value="80" aria-label="Volume" />
+          </div>
+        </div>
+      </section>
+
+      <section class="search" id="search-sec">
+       <<h2 class="section-title">Pencari</  h2>
+       <pdiv class="search__toolbar">
+         <"input type="text" id="search-query" placeholder="Cari video YouTube..." />
+         <Yinput type="password"        <button id="save-key">🔑 Simpan Key</button>
+          <button id="search-btn">🔎 Cari</button>
+        </div>
+        <ul id="search-results" class="results__list" aria-live="polite" aria-label="Hasil pencarian"></ul>
+        <div class="persist-note">
+          API key disimpan di browser Anda (localStorage). Anda bisa membuat API Key di Google Cloud Console.
+        </div>
+      </section>
+
+      <section class="upload" id="upload-sec">
+        <h2 class="section-title">Upload</h2>
+        <div class="upload__toolbar">
+          <input type="text" id="client-id" placeholder="Google OAuth Client ID" />
+          <button id="save-client">💾 Simpan Client ID</button>
+          <button id="auth">🔐 Sign in</button>
+          <button id="signout">🚪 Sign out</button>
+        </div>
+        <div class="upload__form">
+          <input type="file" id="video-file" accept="video/*" />
+          <input type="text" id="video-title" placeholder="Judul video" />
+          <input type="text" id="video-desc" placeholder="Deskripsi video" />
+          <select id="video-privacy">
+            <option value="private">private</option>
+            <option value="unlisted">unlisted</option>
+            <option value="public">public</option>
+          </select>
+          <button id="upload-btn">⤴️ Upload ke YouTube</button>
+        </div>
+        <div class="upload__status" id="upload-status">Status: belum mulai</div>
+      </section>
+
+      <section class="profile" id="profile-sec">
+        <h2 class="section-title">Profil</h2>
+        <div class="profile__header">
+          <img id="profile-avatar" class="profile__avatar" alt="avatar" />
+          <div class="profile__meta">
+            <div class="profile__name" id="profile-name">Belum masuk</div>
+            <div class="profile__email" id="profile-email">—</div>
+            <div class="profile__channel" id="profile-channel">Channel: —</div>
+          </div>
+          <div class="profile__actions">
+            <button id="refresh-profile">🔄 Refresh</button>
+            <button id="open-channel" disabled>📺 Buka Channel</button>
+            <button id="signout-2" disabled>🚪 Sign out</button>
+          </div>
+        </div>
+        <div class="profile__stats" id="profile-stats">
+          <div class="stat"><span id="stat-subs">—</span><small>Subscribers</small></div>
+          <div class="stat"><span id="stat-videos">—</span><small>Videos</small></div>
+          <div class="stat"><span id="stat-views">—</span><small>Views</small></div>
+        </div>
+        <div class="persist-note">
+          Info profil ditarik dari Google akun dan YouTube Data API (channels.list mine=true).
+        </div>
+      </section>
+
+      <section class="browser" id="browser-sec">
+        <h2 class="section-title">Browser</h2>
+        <div class="browser__toolbar">
+          <input type="text" id="browser-url" placeholder="https://m.youtube.com/" value="https://m.youtube.com/" />
+          <button id="open-iframe">🧩 Buka dalam iframe</button>
+          <button id="open-tab">🪟 Buka tab baru</button>
+        </div>
+        <div class="browser__frame">
+          <iframe id="webview" title="In-app browser" referrerpolicy="no-referrer" allowfullscreen></iframe>
+        </div>
+        <div class="persist-note">
+          Catatan: YouTube sering membatasi penyematan situs penuh dengan kebijakan X-Frame-Options.
+          Jika layar kosong atau error, gunakan tombol “Buka tab baru”.
+        </div>
+      </section>
+
+      <section class="playlist" id="playlist-sec">
+        <h2 class="section-title">Playlist</h2>
+        <div class="playlist__toolbar">
+          <button id="add-url">🔗 Tambah URL/ID</button>
+          <button id="import">📥 Import</button>
+          <input type="file" id="import-file" accept="application/json" hidden />
+          <button id="export">📤 Export</button>
+          <button id="clear">🗑️ Bersihkan</button>
+        </div>
+
+        <ul id="playlist" class="playlist__list" aria-live="polite" aria-label="Daftar putar"></ul>
+
+        <div class="persist-note">
+          Playlist tersimpan otomatis (localStorage). Tambah video menggunakan URL YouTube atau ID video.
+          Anda juga bisa import/export playlist dalam format JSON.
+        </div>
+      </section>
+
+      <section class="settings" id="settings-sec">
+        <h2>Pengaturan</h2>
+        <div class="settings__grid">
+          <label>Theme
+            <select id="set-theme">
+              <option value="dark">dark</option>
+              <option value="light">light</option>
+              <option value="system">system</option>
+            </select>
+          </label>
+          <label>Default volume
+            <input type="range" id="set-volume" min="0" max="100" value="80" />
+          </label>
+          <label>Keyboard shortcuts
+            <input type="checkbox" id="set-hotkeys" checked />
+          </label>
+          <label>Search regionCode
+            <input type="text" id="set-region" placeholder="contoh: ID" />
+          </label>
+          <label>Search order
+            <select id="set-order">
+              <option value="relevance">relevance</option>
+              <option value="date">date</option>
+              <option value="viewCount">viewCount</option>
+              <option value="rating">rating</option>
+            </select>
+          </label>
+          <label>Search maxResults
+            <input type="number" id="set-max" min="5" max="50" value="20" />
+          </label>
+          <label>Default upload privacy
+            <select id="set-privacy">
+              <option value="private">private</option>
+              <option value="unlisted">unlisted</option>
+              <option value="public">public</option>
+            </select>
+          </label>
+          <label>Remember browser URL
+            <input type="checkbox" id="set-remember-url" />
+          </label>
+          <label>Autoplay banner
+            <input type="checkbox" id="set-autoplay-banner" checked />
+          </label>
+          <label>Autoplay on select
+            <input type="checkbox" id="set-autoplay-select" />
+          </label>
+        </div>
+        <div class="settings__actions">
+          <button id="settings-save">💾 Simpan</button>
+          <button id="settings-reset">↺ Reset</button>
+        </div>
+        <div class="persist-note">
+          Pengaturan disimpan di localStorage dan diterapkan ke pencarian, upload, volume, dan tampilan.
+        </div>
+      </section>
+
+      <footer class="app__footer">
+        <div class="footer__left">
+          Dibuat dengan YouTube IFrame API.
+        </div>
+        <div class="footer__right">
+          <a href="https://developers.google.com/youtube/iframe_api_reference" target="_blank" rel="noopener">Docs IFrame API</a>
+          ·
+          <a href="https://developers.google.com/youtube/v3/docs/search/list" target="_blank" rel="noopener">Docs Data API (Search)</a>
+          ·
+          <a href="https://developers.google.com/youtube/v3/docs/videos/insert" target="_blank" rel="noopener">Docs Upload</a>
+        </div>
+      </footer>
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
