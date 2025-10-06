@@ -52,6 +52,9 @@
       <section class="playlist">
         <div class="playlist__toolbar">
           <button id="add-url">🔗 Tambah URL/ID</button>
+          <button id="import">📥 Import</button>
+          <input type="file" id="import-file" accept="application/json" hidden />
+          <button id="export">📤 Export</button>
           <button id="clear">🗑️ Bersihkan</button>
         </div>
 
@@ -59,6 +62,7 @@
 
         <div class="persist-note">
           Playlist tersimpan otomatis (localStorage). Tambah video menggunakan URL YouTube atau ID video.
+          Anda juga bisa import/export playlist dalam format JSON.
         </div>
       </section>
 

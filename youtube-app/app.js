@@ -2,6 +2,7 @@
  * YouTube Player App (no Data API key required).
  * - Adds videos by URL or ID
  * - Persists playlist via localStorage
+ * - Import/Export playlist (JSON)
  * - Uses YouTube IFrame API for playback control
  */
 
@@ -31,6 +32,9 @@
     mute: document.getElementById("mute"),
     volume: document.getElementById("volume"),
     addUrl: document.getElementById("add-url"),
+    importBtn: document.getElementById("import"),
+    importFile: document.getElementById("import-file"),
+    exportBtn: document.getElementById("export"),
     clear: document.getElementById("clear"),
     playlist: document.getElementById("playlist"),
   };
@@ -188,6 +192,44 @@
     currentIndex = -1;
     renderPlaylist();
     savePlaylist();
+  };
+
+  const exportPlaylist = () => {
+    const data = {
+      schema: "youtube-player.v1",
+      items: playlist.map((t) => ({ id: t.id, title: t.title })),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "youtube_playlist.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const importPlaylistFromFile = async (file) => {
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      if (!data || data.schema !== "youtube-player.v1" || !Array.isArray(data.items)) {
+        alert("Format file tidak valid.");
+        return;
+      }
+      // Replace playlist
+      playlist = [];
+      for (const item of data.items) {
+        if (item && item.id) {
+          await addTrack({ id: item.id, title: item.title });
+        }
+      }
+      if (playlist.length) playIndex(0);
+      savePlaylist();
+    } catch {
+      alert("Gagal mengimpor playlist.");
+    }
   };
 
   // Playback ops
@@ -386,6 +428,17 @@
     const title = prompt("Judul (opsional):") || undefined;
     await addTrack({ id, title });
   });
+
+  els.importBtn.addEventListener("click", () => els.importFile.click());
+  els.importFile.addEventListener("change", async (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await importPlaylistFromFile(file);
+      e.target.value = "";
+    }
+  });
+
+  els.exportBtn.addEventListener("click", exportPlaylist);
 
   els.clear.addEventListener("click", () => {
     if (confirm("Bersihkan seluruh playlist?")) {
