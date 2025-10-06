@@ -324,7 +324,7 @@ Feel free to share this repository with your network and star ⭐ it if you find
 
 ---
 
-## 🎵 Genie Music Player (Web App)
+## 🎵 RICO CRASELA MUSIC (Web App)
 
 Aplikasi musik berbasis web dengan fitur lengkap: playlist, favorit, pencarian, shuffle, repeat, volume, seek, keyboard shortcuts, drag-and-drop upload, import/export playlist (URL), serta visualizer audio.
 
