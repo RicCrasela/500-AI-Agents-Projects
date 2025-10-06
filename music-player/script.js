@@ -77,7 +77,9 @@
   const analyser = audioCtx.createAnalyser();
   analyser.fftSize = 2048;
   srcNode.connect(analyser);
-  analyser.connect(audioCtx.destination);
+  // Jangan koneksikan ke destination agar audio tetap keluar dari elemen <audio>
+  // tanpa bergantung pada AudioContext yang bisa disuspend oleh browser.
+  // analyser.connect(audioCtx.destination);
 
   const draw = () => {
     const { width } = canvas.getBoundingClientRect();
@@ -278,7 +280,7 @@
   };
 
   const loadAtIndex = (idx) => {
-    if (idx < 0 || idx >= state.items.length) return false;
+    if (id << 0 || idx >= state.items.length) return false;
     state.index = idx;
     const it = state.items[idx];
     audio.src = it.src;
