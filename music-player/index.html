@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RICO CRASELA MUSIC</title>
+  <meta name="description" content="Pemutar musik modern berbasis web dengan playlist, shuffle, repeat, favorit, pencarian, dan visualizer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18V5l9-2v13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7" cy="18" r="3" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="16" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+        <h1>RICO CRASELA MUSIC</h1>
+      </div>
+      <div class="right-actions">
+        <button id="installPWA" class="ghost" title="Install sebagai Aplikasi">Install</button>
+        <a class="ghost" href="https://github.com" target="_blank" rel="noreferrer">About</a>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="left-panel">
+        <div class="uploader">
+          <label class="file-btn">
+            + Tambah File Audio
+            <input id="fileInput" type="file" accept="audio/*" multiple hidden>
+          </label>
+          <div class="or">atau</div>
+          <form id="urlForm" class="url-form">
+            <input id="urlInput" type="url" placeholder="Tempel URL audio (mp3/aac/ogg/m4a)..." required>
+            <button type="submit">Tambah</button>
+          </form>
+          <div id="dropZone" class="dropzone">Seret & lepas file audio ke sini</div>
+          <div class="import-export">
+            <button id="exportPlaylist" class="ghost">Export Playlist</button>
+            <label class="ghost">
+              Import Playlist
+              <input id="importInput" type="file" accept="application/json" hidden>
+            </label>
+            <button id="addSample" class="ghost" title="Tambah contoh lagu yang siap diputar">Tambah Contoh Lagu</button>
+          </div>
+        </div>
+
+        <div class="search-bar">
+          <input id="searchInput" type="search" placeholder="Cari judul / artis">
+          <button id="filterFav" class="ghost" title="Tampilkan favorit saja">★ Favorit</button>
+        </div>
+
+        <ul id="playlist" class="playlist" aria-label="Daftar Lagu">
+          <!-- items injected -->
+        </ul>
+      </section>
+
+      <section class="player-panel">
+        <div class="now-playing">
+          <div class="cover" id="cover">
+            <div class="cover-ph">♪</div>
+          </div>
+          <div class="meta">
+            <div id="title" class="title">Tidak ada lagu</div>
+            <div id="artist" class="artist">—</div>
+          </div>
+        </div>
+
+        <div id="notice" class="notice" role="alert" aria-live="assertive"></div>
+        <canvas id="visualizer" height="90"></canvas>
+
+        <div class="controls">
+          <div class="row">
+            <button id="btnShuffle" class="ghost" title="Acak (S)">Shuffle</button>
+            <div class="transport">
+              <button id="btnPrev" class="circle" title="Sebelumnya (P)">
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5v14M7 12l11 7V5L7 12z" fill="currentColor"/></svg>
+              </button>
+              <button id="btnPlay" class="primary circle" title="Putar/Jeda (Space)">
+                <svg id="iconPlay" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7-11-7z" fill="currentColor"/></svg>
+                <svg id="iconPause" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="currentColor"/></svg>
+              </button>
+              <button id="btnNext" class="circle" title="Berikutnya (N)">
+                <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 19V5M17 12L6 19V5l11 7z" fill="currentColor"/></svg>
+              </button>
+            </div>
+            <button id="btnRepeat" class="ghost" title="Ulangi (R)">Repeat: Off</button>
+          </div>
+
+          <div class="row">
+            <span id="currentTime" class="time">0:00</span>
+            <input id="seek" type="range" min="0" max="100" value="0" step="0.1" class="seek">
+            <span id="totalTime" class="time">0:00</span>
+          </div>
+
+          <div class="row">
+            <div class="volume">
+              <button id="btnMute" class="ghost" title="Mute (M)">🔈</button>
+              <input id="volume" type="range" min="0" max="1" step="0.01" value="1">
+            </div>
+            <div class="queue-actions">
+              <button id="btnClear" class="ghost danger" title="Bersihkan playlist">Bersihkan</button>
+            </div>
+          </div>
+        </div>
+
+        <footer class="footer">
+          Pintasan: Space=Putar/Jeda, ←/→=Seek, ↑/↓=Volume, N=Next, P=Prev, S=Shuffle, R=Repeat, M=Mute
+        </footer>
+      </section>
+    </main>
+  </div>
+
+  <audio id="audio" crossorigin="anonymous"></audio>
+  <script src="./script.js"></script>
+</body>
+</html>
