@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.11",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-progress": "^1.1.8",
+    "@radix-ui/react-scroll-area": "^1.2.10",
+    "@radix-ui/react-toast": "^1.2.15",
+    "@types/peerjs": "^0.0.30",
+    "@types/socket.io": "^3.0.1",
+    "lucide-react": "^0.562.0",
+    "peerjs": "^1.5.5",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
+  }
+}
